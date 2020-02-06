@@ -1,13 +1,49 @@
 version: '3.3'
 
 services:
-  wordpress:
-    image: apache:1.0
+  traefik:
+    image: library/traefik:1.7
+    command: 
+      - "--api"
+      - "--entrypoints=Name:http Address::80"
+      - "--entrypoints=Name:https Address::443 TLS"
+      - "--defaultentrypoints=http,https"
+      - "--docker"
+      - "--docker.swarmmode"
+      - "--docker.watch"
+    networks:
+      - proxys
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
+      - 443:443
+      - 8080:8080
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
     networks:
       - backend
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      
+  wordpress:
+    image: apaword:1.0
+    networks:
+      - backend
+      - proxys
+    labels:
+      traefik.port: 80
+      traefik.frontend.rule: "Host:wordpress.192.168.20.210.nip.io"
+      traefik.docker.network: 'proxy'
+volumes:
+  db_data: {}
 
 networks:
   backend:
-
+  proxys:
+    external: true
