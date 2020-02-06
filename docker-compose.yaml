@@ -1,0 +1,13 @@
+version: '3.3'
+
+services:
+  wordpress:
+    image: apache:1.0
+    ports:
+      - 80:80
+    networks:
+      - backend
+
+networks:
+  backend:
+
