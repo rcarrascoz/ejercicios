@@ -12,13 +12,16 @@ services:
       - "--docker.swarmmode"
       - "--docker.watch"
     networks:
-      - proxys
+      - proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
       - 443:443
       - 8080:8080
+    deploy:
+      restart_policy:
+        condition: on-failure
   db:
     image: mysql:5.7
     volumes:
@@ -35,15 +38,16 @@ services:
     image: apaword:1.0
     networks:
       - backend
-      - proxys
-    labels:
-      traefik.port: 80
-      traefik.frontend.rule: "Host:wordpress.192.168.20.210.nip.io"
-      traefik.docker.network: 'proxy'
+      - proxy
+    deploy:
+      labels:
+        traefik.port: 80
+        traefik.frontend.rule: "Host:wordpress.192.168.20.210.nip.io"
+        traefik.docker.network: 'proxy'
 volumes:
   db_data: {}
 
 networks:
   backend:
-  proxys:
+  proxy:
     external: true
