@@ -26,6 +26,8 @@ services:
     image: mysql:5.7
     volumes:
       - db_data:/var/lib/mysql
+    ports:
+      - 3306:3306
     networks:
       - backend
     environment:
@@ -35,14 +37,14 @@ services:
       MYSQL_PASSWORD: wordpress
       
   wordpress:
-    image: apaword:1.0
+    image: rcarrascoz/ejercicios
     networks:
-      - backend
       - proxy
+      - backend
     deploy:
       labels:
         traefik.port: 80
-        traefik.frontend.rule: "Host:wordpress.192.168.20.210.nip.io"
+        traefik.frontend.rule: "Host:wordpress.172.19.53.89.nip.io"
         traefik.docker.network: 'proxy'
 volumes:
   db_data: {}
